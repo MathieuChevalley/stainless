@@ -13,7 +13,7 @@ val isMac     = osInf.indexOf("Mac") >= 0
 val osName = if (isWindows) "win" else if (isMac) "mac" else "unix"
 val osArch = System.getProperty("sun.arch.data.model")
 
-val inoxVersion = "1.1.0-126-g334f862"
+val inoxVersion = "1.1.0-114-g364d067"
 val dottyVersion = "0.1.1-bin-20170429-10a2ce6-NIGHTLY"
 
 lazy val nParallel = {
@@ -115,6 +115,7 @@ lazy val commonFrontendSettings: Seq[Setting[_]] = Defaults.itSettings ++ Seq(
   resourceGenerators in Compile += Def.task {
     for ((libPath, libFile) <- libraryFiles) yield {
       val resourceFile = (resourceManaged in Compile).value / libPath
+      println(resourceFile)
       IO.write(resourceFile, IO.read(libFile))
       resourceFile
     }
@@ -126,7 +127,7 @@ lazy val commonFrontendSettings: Seq[Setting[_]] = Defaults.itSettings ++ Seq(
     def removeSlashU(in: String): String =
       in.replaceAll("\\\\" + "u", "\\\\\"\"\"+\"\"\"u")
       .replaceAll("\\\\" + "U", "\\\\\"\"\"+\"\"\"U")
-
+    println(libraryFiles)
     IO.write(main,
       s"""|package stainless
           |
@@ -151,7 +152,7 @@ lazy val commonFrontendSettings: Seq[Setting[_]] = Defaults.itSettings ++ Seq(
 val scriptSettings: Seq[Setting[_]] = Seq(
   extraClasspath := {
     ((classDirectory in Compile).value.getAbsolutePath +: (dependencyClasspath in Compile).value.map(_.data.absolutePath))
-      .mkString(System.getProperty("path.separator"))
+      .mkString(System.getProperty("path.separator")).replace("\\", "\\\\")
   }
 )
 
